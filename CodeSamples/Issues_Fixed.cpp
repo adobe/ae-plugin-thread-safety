@@ -41,12 +41,14 @@ int SomeComputation(int x) {
 }
 
 
-// Case 1: You might as well pass it between functions.
+// Case 1: You might as well pass it between functions
 // Declared in EffectMain.
 
-// Case 2: Can just be statically initialized.
+// Case 2: Can just be statically initialized
+// 2a Just put const in front.
 const int should_just_be_const = 2;
 
+// 2b: You might have to change data types around a bit
 std::array<int, 64> InitializeState() {
 	std::array<int, 64> temp;
 	for (int i = 0; i < 64; ++i) {
@@ -55,15 +57,15 @@ std::array<int, 64> InitializeState() {
 	return temp;
 }
 static const std::array<int, 64> state_with_initializer = InitializeState();
-//static bool state_was_initialized = false; No need for flags.
+//static bool state_was_initialized = false; No need for flags
 
-// Case 3: make a const static local to initialize once and pass through.
+// Case 3: make a const static local to initialize once and pass through
 // Declared in EffectMain.
 
-// Case 4a: Just make it thread_local.
+// Case 4a: Just make it thread_local
 thread_local static int needs_to_stay_static;
 
-// Case 4b: Protect all accesses with a mutex.
+// Case 4b: Protect all accesses with a mutex
 std::mutex case4b_mutex;
 static int every_thread_needs_latest_state;
 
@@ -223,6 +225,7 @@ Render (
 		// scoped_lock would be preferable if your compiler supports it.
 		std::lock_guard<std::mutex> lock(case4b_mutex);
 		local_capture = every_thread_needs_latest_state;
+		every_thread_needs_latest_state = SomeComputation(local_capture);
 	}
 	int I_am_using_global_state_here = should_just_be_const
 		* should_just_be_local
@@ -231,9 +234,9 @@ Render (
 		local_capture *
 		needs_to_stay_static;
 
-	linesL 		= output->extent_hint.bottom - output->extent_hint.top;
-	giP.gainF	= params[SKELETON_GAIN]->u.fs_d.value;
-	giP.gainF	*= I_am_using_global_state_here;
+	linesL    = output->extent_hint.bottom - output->extent_hint.top;
+	giP.gainF = params[SKELETON_GAIN]->u.fs_d.value;
+	giP.gainF *= I_am_using_global_state_here;
 
 	if (PF_WORLD_IS_DEEP(output)){
 		ERR(suites.Iterate16Suite1()->iterate(	in_data,

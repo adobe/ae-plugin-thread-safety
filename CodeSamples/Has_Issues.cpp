@@ -39,12 +39,14 @@ int SomeComputation(int x) {
 	return x * 2;
 }
 
-// Case 1: you might as well pass it between functions.
+// Case 1: you might as well pass it between functions
 static int should_just_be_local;
 
-// Case 2: Could just be initialized 
+// Case 2: Could just be initialized
+// 2a: a simple case
 int should_just_be_const = 2;
 
+// 2b: initialization can't easily be done in line
 static int state_with_initializer[64];
 static bool state_was_initialized = false;
 void InitializeState() {
@@ -57,7 +59,7 @@ void InitializeState() {
 // Case 3: Initialized once based on runtime state and reused across renders. Should be a const static local
 static int depends_on_unchanging_prerender_state;
 
-// Case 4a: Should change across renders but each thread should have its own copy.
+// Case 4a: Should change across renders but each thread should have its own copy
 static int needs_to_stay_static;
 
 // Case 4b: Should change across renders but every thread needs an up-to-date-copy
@@ -210,11 +212,14 @@ Render (
 	AEFX_CLR_STRUCT(giP);
 	A_long				linesL	= 0;
 
+	int local_capture = every_thread_needs_latest_state;
+	every_thread_needs_latest_state = SomeComputation(local_capture);
+
 	int I_am_using_global_state_here = should_just_be_const
 		* should_just_be_local
 		* state_with_initializer[0] *
 		depends_on_unchanging_prerender_state *
-		every_thread_needs_latest_state *
+		local_capture *
 		needs_to_stay_static;
 
 	linesL 		= output->extent_hint.bottom - output->extent_hint.top;
