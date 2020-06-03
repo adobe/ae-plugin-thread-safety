@@ -1,0 +1,3 @@
+These source files hold examples of some kinds of issues you're likely to run into while vetting your plugins for thread safety issues. Has_Issues.cpp contains some example cases of types of global state you might run into, while Issues_Fixed.cpp contains our recommended way of fixing them.
+For more information, see the Thread Safety portion of After Effects' SDK docs at https://ae-plugin-sdk-guide.readthedocs.io/.
+The two sample files contain just a few modifications on top of the SDK skeleton. If you're interested in playing around with seeing what symbols come out of compilation you can replace Skeleton.cpp with one of them and build.
