@@ -3,7 +3,4 @@ This is After Effects' internal tool for finding possible thread safety issues i
 Syntax:
 	check_symbols_for_thread_safety.sh [file]
 
-This will run nm on your binary and look for any static or global state in your project. Symbols will be of the form:
-	[address] [symbol type] [symbol name]
-for more information on symbol types, see https://linux.die.net/man/1/nm .
-
+This will run nm on your binary and look for any static or global state in your project. See the the section on plug-in thread safety at http://ae-plugin-sdk.aenhancers.com/ for more detail on how to interpret output and fix issues.
