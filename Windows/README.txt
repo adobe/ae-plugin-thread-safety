@@ -10,4 +10,4 @@ In the terminal, cd to this directory and run .\register_msdia.cmd
 After this, the script should just work, e.g.:
 .\CheckThreadSafeIssues.exe -sf [Path to your project pdb]
 
-For instructions on how to use the tool and understand the output, see the AfterEffects Plugin SDK docs at http://ae-plugin-sdk.aenhancers.com/
+For instructions on how to use the tool and understand the output, see the AfterEffects Plugin SDK docs at http://ae-plugin-sdk.aenhancers.com/effect-details/multi-frame-rendering-in-ae.html
