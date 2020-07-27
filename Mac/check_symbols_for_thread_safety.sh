@@ -50,4 +50,5 @@ nm -demangle -print-file-name "$1" |\
 	grep -v "vtable for boost::system::system_error" |\
 	grep -v "vtable for boost::system::error_category::std_category" |\
 	grep -v "boost::gil" |\
-	grep -v "boost::exception"\
+	grep -v "boost::exception" |\
+	grep -v "[s|S]; vtable for "
