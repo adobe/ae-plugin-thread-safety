@@ -12,55 +12,51 @@
 setlocal
 
 set _clsid=e6756135-1e65-4d17-8576-610761398c3c
-
-:: Set this to amd64 for 64-bit Windows
-set _platform=amd64
-
-if /i "%_platform%" == "x86" (
-	set _reg_root=HKCR\WOW6432Node
-	set _suffix=
-) else (
-	if /i "%_platform%" == "amd64" (
-		set _reg_root=HKCR
-		set _suffix=\amd64
-	) else (
-		@echo Bad platform
-		goto :eof
-	)
-)
+set _reg_root=HKCR
 
 :: Check if msdia140.dll is already registered
 reg query %_reg_root%\{%_clsid%} 1>nul 2>nul
 if errorlevel 1 goto not_registered
 
 @echo msdia140.dll is already registered - no further action required
+goto :eof
 
 :not_registered
 
-:: Find DIA SDK in the path
+:: Find devenv.exe in the path
 set _devenv=
-for %%e in (%PATHEXT%) do @for %%i in ("devenv.exe") do (
+for %%i in ("devenv.exe") do (
 	if NOT "%%~$PATH:i"=="" (
 		set _devenv=%%~$PATH:i
 	)
 	if defined _devenv goto found_devenv
 )
-if not defined _devenv goto run_vcvars32
+if not defined _devenv goto run_vcvars64
 :found_devenv
 
 :: Extract the base path
 for /f "tokens=1-4 delims=\" %%i in ("%_devenv%") do set _msdia_root=%%i\%%j\%%k\%%l
 
 :: Now find the DIA SDK
-for /f "delims=" %%i in ('dir /s /b /ad "%_msdia_root%\DIA SDK" ^| findstr bin') do (
-	set _msdia_path=%%i%_suffix%
+set _vs_sku=
+if not exist "%_msdia_root%\DIA SDK" (
+	for %%e in (Community,Professional,Enterprise) do (
+		if exist "%_msdia_root%\%%e\DIA SDK" (
+			set _vs_sku=\%%e
+			goto got_suffix
+		)
+	)
+	goto dll_not_found
+)
+:got_suffix
+
+set _msdia=
+for /f "delims=" %%i in ('dir /s /b "%_msdia_root%%_vs_sku%\DIA SDK\msdia140.dll" ^| findstr -i amd64') do (
+	set _msdia=%%i
 	goto got_bin_path
 )
+if "%_msdia" == "" goto dll_not_found
 :got_bin_path
-set _msdia=%_msdia_path%\msdia140.dll
-
-::Make sure the file exists
-if not exist "%_msdia%" goto dll_not_found
 
 :: Now register msdia140.dll
 regsvr32 /s "%_msdia%"
@@ -70,8 +66,8 @@ if errorlevel 1 goto error_registering
 
 goto :eof
 
-:run_vcvars32
-echo Unable to find devenv.exe in the path. Please run vcvars32.cmd and try again
+:run_vcvars64
+echo Unable to find devenv.exe in the path. Please run vcvars64.cmd and try again
 goto :eof
 
 :dll_not_found
